@@ -12,10 +12,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **フロントエンド**: HTML5 + CSS3 + Vanilla JavaScript
 - **音声認識**: Web Speech API (`SpeechRecognition`)
 - **AI翻訳**: Chrome AI API (`LanguageModel`)
-- **実行環境**: Chrome Canary 128+ （Prompt API有効化必須）
+- **実行環境**: Chrome Stable 140+ （Prompt API標準搭載）
 
 ### ファイル構成
-- `realtime-speech-translator.html`: メインアプリケーションファイル（すべての機能を含む）
+- `index.html`: メインアプリケーションファイル（すべての機能を含む）
 - `.claude/settings.local.json`: Claude Code設定ファイル
 
 ### 主要コンポーネント
@@ -38,9 +38,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 開発時の注意事項
 
 ### 環境要件
-- Chrome Canary 128以降必須
-- `chrome://flags/#optimization-guide-on-device-model` を有効化
-- `chrome://flags/#prompt-api-for-gemini-nano` を有効化
+- Chrome Stable 140+ を使用
+- 初回利用時に Gemini Nano モデルのダウンロードが始まるため、[Prompt API ドキュメント](https://developer.chrome.com/docs/ai/prompt-api) に記載されたハードウェア要件を満たすこと
 - マイクアクセス許可必要
 
 ### デバッグとテスト
@@ -52,7 +51,7 @@ python -m http.server 8000
 # または
 npx serve .
 
-# ブラウザで http://localhost:8000/realtime-speech-translator.html にアクセス
+# ブラウザで http://localhost:8000/index.html にアクセス
 ```
 
 ### 主要な機能ポイント

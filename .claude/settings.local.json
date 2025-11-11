@@ -1,26 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir:*)",
-      "WebFetch(domain:developer.chrome.com)",
-      "Read(/C:\\Users\\Takey\\OneDrive\\デスクトップ\\Projects\\realtime-translation/**)",
-      "mcp___21st-dev_magic__21st_magic_component_refiner",
-      "Bash(git init:*)",
-      "Bash(git remote add:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git config:*)",
-      "Bash(git push:*)",
-      "Read(/C:\\Users\\Takey\\OneDrive\\デスクトップ\\Projects\\realtime-translation/**)",
-      "Read(/C:\\Users\\Takey\\OneDrive\\デスクトップ\\Projects\\realtime-translation/**)",
-      "Read(/C:\\Users\\Takey\\OneDrive\\デスクトップ\\Projects\\realtime-translation/**)",
-      "Read(/C:\\Users\\Takey\\OneDrive\\デスクトップ\\Projects\\realtime-translation/**)",
-      "mcp__playwright__browser_navigate",
-      "mcp__playwright__browser_console_messages",
-      "mcp__playwright__browser_evaluate",
-      "mcp__playwright__browser_click",
-      "mcp__playwright__browser_snapshot",
-      "mcp__playwright__browser_wait_for"
+      "Bash(mkdir:*)",
+      "Bash(npm start)",
+      "Bash(npm install)",
+      "Bash(tree:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill /F /PID 28344)",
+      "Bash(npx kill-port:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
