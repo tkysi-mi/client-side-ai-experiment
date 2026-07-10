@@ -4,18 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-このプロジェクトは、Chrome AI API（Prompt API）を使用したリアルタイム英日音声翻訳アプリケーションです。単一のHTMLファイルで完結するスタンドアロンWebアプリケーションとして実装されています。
+このプロジェクトは、EdTech における Client-Side LLM の活用可能性を検証する実験用 Web アプリケーションです。Chrome AI API（Prompt API）を使用し、学習者向けの翻訳支援と英語説明アクティビティをオンデバイスで実行します。
 
 ## アーキテクチャ
 
 ### 技術スタック
 - **フロントエンド**: HTML5 + CSS3 + Vanilla JavaScript
 - **音声認識**: Web Speech API (`SpeechRecognition`)
-- **AI翻訳**: Chrome AI API (`LanguageModel`)
-- **実行環境**: Chrome Stable 140+ （Prompt API標準搭載）
+- **AI機能**: Chrome AI API (`LanguageModel`)
+- **実行環境**: Chrome 148+（Web 向け Prompt API 搭載）
 
 ### ファイル構成
-- `index.html`: メインアプリケーションファイル（すべての機能を含む）
+- `public/index.html`: メインアプリケーション画面
+- `public/js/app.js`: 翻訳、学習ゲーム、モデル管理
+- `public/css/style.css`: アプリケーションのスタイル
+- `public/assets/scenarios/`: 学習ゲームのシナリオ画像
+- `index.js`: Express サーバー
 - `.claude/settings.local.json`: Claude Code設定ファイル
 
 ### 主要コンポーネント
@@ -30,7 +34,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ストリーミング翻訳による高速レスポンス
 - デバウンシング機能による効率的な翻訳処理
 
-#### 3. UI管理システム
+#### 3. 英語説明アクティビティ
+- 制限時間内に状況の解決方法を英語で説明する学習ゲーム
+- CEFR A1/A2 学習者を想定した意味伝達重視の LLM 評価
+- 音声入力とテキスト入力の両方に対応
+
+#### 4. UI管理システム
 - レスポンシブデザイン対応
 - ステータス表示（API状態、音声認識状態、モデル状態）
 - 翻訳履歴管理（最大10件保持）
@@ -38,8 +47,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 開発時の注意事項
 
 ### 環境要件
-- Chrome Stable 140+ を使用
+- Chrome 148+ を使用
 - 初回利用時に Gemini Nano モデルのダウンロードが始まるため、[Prompt API ドキュメント](https://developer.chrome.com/docs/ai/prompt-api) に記載されたハードウェア要件を満たすこと
+- モデル名、バージョン、端末に応じたバリアントはアプリケーションから指定できず、Chrome が自動的に選択・更新する
+- インストール済みモデルのバージョンは `chrome://on-device-internals` で確認する
 - マイクアクセス許可必要
 
 ### デバッグとテスト
@@ -85,9 +96,10 @@ npx serve .
 - **翻訳の遅延**: ネットワーク状況とモデル状態確認
 
 ## セキュリティ考慮事項
-- すべての処理はクライアントサイドで完結
-- 外部APIへの音声データ送信なし
-- ローカルAIモデルによる翻訳処理
+- Prompt API による LLM 推論はクライアントサイドで完結
+- プロンプトと生成結果は LLM サーバーへ送信されない
+- Web Speech API の音声処理方式はブラウザや OS に依存するため、完全なローカル処理を前提にしない
+- 学習者データを扱う場合は、利用環境の音声認識仕様とデータ取り扱いを確認する
 
 ## 今後の拡張可能性
 - 他言語対応（言語選択UI追加）

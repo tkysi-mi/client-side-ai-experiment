@@ -314,7 +314,7 @@ const survivalItems = [
 async function initialize() {
     // Chrome AI APIの確認
     if (!window.LanguageModel) {
-        showWarning('Chrome AI APIが利用できません。Chromeを最新バージョン (Stable 140+) にアップデートし、必要に応じて Prompt API の Origin Trial トークンが設定されているか確認してください。');
+        showWarning('Chrome AI APIが利用できません。Chrome 148 以降へアップデートし、Prompt API の利用要件を満たしているか確認してください。');
         aiStatus.textContent = '利用不可';
         aiStatus.className = 'status-value inactive';
         startBtn.disabled = true;
