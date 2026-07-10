@@ -515,12 +515,12 @@ button:focus {
 
 .scenario-image {
     display: block;
-    width: 100%;
+    width: min(50%, 420px);
     aspect-ratio: 4 / 3;
     object-fit: cover;
     object-position: center;
     border-radius: 6px;
-    margin-bottom: 18px;
+    margin: 0 auto 18px;
     background: #1e293b;
 }
 
@@ -911,6 +911,10 @@ button:focus {
     .game-language-toggle {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .scenario-image {
+        width: 100%;
     }
 
     .goal-strip {
