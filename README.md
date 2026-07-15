@@ -1,58 +1,67 @@
 # EdTech Client-Side LLM Experiments
 
-EdTech における **Client-Side LLM の活用可能性**を検討するための実験リポジトリです。Google Chrome の Prompt API とオンデバイスの Gemini Nano を使用し、学習者向けの対話、支援、フィードバックをブラウザ内で実現する方法を検証します。
+EdTech における **Client-Side LLM の活用可能性**を検討する実験リポジトリです。Chrome Prompt API とオンデバイスの Gemini Nano を使い、学習者向けの対話、支援、フィードバックをブラウザ内で実現する方法を検証します。
 
-サーバー側の LLM に依存しない構成を通じて、教育データのプライバシー、応答速度、オフライン利用、運用コスト、端末ごとのモデル性能といった、EdTech で重要になる論点を実装ベースで探ることを目的としています。
+## 収録実験
 
-## 実験テーマ
+- **リアルタイム英日音声翻訳**: Web Speech APIで英語音声を認識し、Prompt APIで日本語へストリーミング翻訳します。
+- **Gemini Nano 音声理解**: Silero VADで発話区間を検出し、音声をGemini Nanoへ直接渡して文字起こしと翻訳を行います。
+- **ピンチ脱出ゲーム**: 限られたアイテムを使った英語説明を、CEFR A1/A2を想定して意味伝達重視で評価します。
 
-- 学習者の入力を外部の LLM サーバーへ送信しない、プライバシーに配慮した学習体験
-- ストリーミング生成と音声認識を組み合わせた、待ち時間の短い支援とフィードバック
-- オンデバイスモデルの能力、制約、端末差を踏まえた教材・アクティビティ設計
-- ネットワーク接続や従量課金への依存を抑えた EdTech 機能の実現可能性
-- 小型 LLM に適したプロンプト、評価基準、エラーハンドリングの検証
-
-## 収録デモ
-
-### リアルタイム英日音声翻訳
-
-Web Speech API で英語音声を連続認識し、Prompt API で日本語へストリーミング翻訳します。学習者が発話内容をすぐ確認できる支援機能として、オンデバイス LLM の速度と翻訳品質を検証します。
-
-### ピンチ脱出ゲーム
-
-学習者が限られたアイテムを使って状況を切り抜ける方法を英語で説明するアクティビティです。Prompt API は CEFR A1/A2 レベルを想定し、文法の正確さだけでなく「意図や意味が伝わったか」を重視して回答を評価します。
+各実験は独立したURLと実行環境パネルを持ち、必要なAPI、権限、Gemini Nanoの準備状況をページ内で確認できます。
 
 ## 技術構成
 
-- Chrome Prompt API (`LanguageModel`) によるオンデバイス推論
-- Web Speech API (`SpeechRecognition`) による英語音声のテキスト化
-- `promptStreaming` を使った逐次的な結果表示
-- モデル状態とダウンロード進捗の監視
-- HTML、CSS、Vanilla JavaScript、Express による最小構成
+- Vite 8 / React 19 / TypeScript
+- React Router
+- Tailwind CSS 4 / Shadcn UIの限定採用 / Radix UI / Lucide React
+- Chrome Prompt API (`LanguageModel`)
+- Web Speech API (`SpeechRecognition`)
+- Silero VAD / ONNX Runtime Web
+- Vitest / React Testing Library / Playwright
+- Railway / Caddy
 
-## セットアップ
+## ローカル開発
+
+Node.js 22.12以降が必要です。
 
 ```bash
 npm install
 npm run dev
-# または npm start
 ```
 
-ローカルサーバーが `http://localhost:3000` で起動します。Chrome 148 以降では Web 向け Prompt API が利用できます。初回利用時に Gemini Nano モデルのダウンロードが開始されるため、十分なストレージとマシンスペックを用意してください。詳細な対応状況とハードウェア要件は [The Prompt API | Chrome for Developers](https://developer.chrome.com/docs/ai/prompt-api) を参照してください。
+Viteの開発サーバーが表示するURLへアクセスしてください。
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm run preview
+```
+
+## URL
+
+- `/`: プロジェクトの目的と実験一覧
+- `/experiments/translator`: リアルタイム英日音声翻訳
+- `/experiments/nano-audio`: Silero VADとGemini Nanoによる音声理解
+- `/experiments/survival`: ピンチ脱出ゲーム
 
 ## 使用モデル
 
-Chrome の Prompt API は、ブラウザ内蔵の基盤モデルとして Gemini Nano を使用します。このアプリケーションからモデル名やバージョンを指定することはできません。Chrome が端末性能に応じて適切なバリアント（例: 2B または 4B パラメータ）を選択し、モデルのダウンロードと更新も管理します。
+ChromeのPrompt APIは、ブラウザ内蔵のGemini Nanoを使用します。アプリケーションからモデル名やバージョンは指定できず、Chromeが端末性能に応じたバリアントと更新を管理します。インストール済みモデルは`chrome://on-device-internals`で確認できます。
 
-モデルの正確なバージョンは JavaScript から取得できません。インストール済みモデルは `chrome://on-device-internals` で確認できます。詳細は [Chrome の組み込みモデル管理](https://developer.chrome.com/docs/ai/understand-built-in-model-management) を参照してください。
+Chrome 148以降と、[Prompt APIのハードウェア要件](https://developer.chrome.com/docs/ai/prompt-api)を満たす端末を想定しています。
 
-## 注意事項
+Gemini Nanoの音声入力にはGPUが必要です。音声理解実験では、Silero VADのモデル、AudioWorklet、ONNX Runtime WebのWASMを同一オリジンから読み込みます。
 
-- マイク権限が必要です。
-- Chrome 148+ を想定しています。
-- Prompt API による LLM 推論はブラウザ内で実行され、プロンプトや生成結果は LLM サーバーへ送信されません。
-- Web Speech API の音声認識方式はブラウザや OS の実装に依存し、音声が外部サービスで処理される場合があります。教育現場で利用する際は、対象環境の仕様とデータ取り扱いを別途確認してください。
-- `temperature` と `topK` のサンプリングパラメータを Web サイトから指定するには、Chrome 148 以降でも対象の Origin Trial が必要です。Origin Trial を使用しない場合は、これらの指定を削除してブラウザの既定値を使用してください。詳細は [The Prompt API | Chrome for Developers](https://developer.chrome.com/docs/ai/prompt-api#model_parameters) を参照してください。
+## プライバシー上の注意
+
+- Prompt APIによるLLM推論はブラウザ内で実行され、プロンプトや生成結果はLLMサーバーへ送信されません。
+- Web Speech APIの音声認識方式はブラウザやOSに依存し、音声が外部サービスで処理される場合があります。教育現場で利用する際は対象環境の仕様を確認してください。
+
+## Railway
+
+本番環境ではマルチステージDockerfileでViteをビルドし、Caddyが`dist/`を配信します。Caddyは通常URLのSPAフォールバックと`/health`を提供します。RailwayのHealth Check Pathには`/health`を設定してください。
 
 ## ライセンス
 

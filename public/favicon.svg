@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Client-side AI Learning Lab">
+  <rect width="64" height="64" rx="14" fill="#ddf9ef"/>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="12.5" fill="none" stroke="#55ddb7" stroke-width="3"/>
+  <path d="M34 12l3.8 11.2L49 27l-11.2 3.8L34 42l-3.8-11.2L19 27l11.2-3.8L34 12z" fill="none" stroke="#263238" stroke-width="3.4" stroke-linejoin="round"/>
+  <path d="M18 34l2 5.5 5.5 2-5.5 2-2 5.5-2-5.5-5.5-2 5.5-2 2-5.5z" fill="none" stroke="#263238" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M47 11l1.4 4 4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4 1.4-4z" fill="#35cfa4"/>
+</svg>
