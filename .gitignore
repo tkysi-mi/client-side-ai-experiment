@@ -4,6 +4,15 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Build and test output
+dist/
+test-results/
+playwright-report/
+visual-output/
+*.tsbuildinfo
+public/vad/
+src/generated/vad/
+
 # Environment variables
 .env
 .env.local
@@ -23,3 +32,6 @@ Thumbs.db
 # Logs
 logs
 *.log
+
+# Runtime artifacts
+vite-pid.txt

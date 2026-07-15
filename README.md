@@ -1,43 +1,67 @@
-# Real-time English–Japanese Speech Translation Demo
+# EdTech Client-Side LLM Experiments
 
-Google の **Prompt API for Gemini Nano** を利用したクライアントサイド LLM デモです。最新の Chrome (Stable 140+ 以降) が備えるオンデバイス機能を活用し、ブラウザだけでリアルタイム英日翻訳を実現します。
+EdTech における **Client-Side LLM の活用可能性**を検討する実験リポジトリです。Chrome Prompt API とオンデバイスの Gemini Nano を使い、学習者向けの対話、支援、フィードバックをブラウザ内で実現する方法を検証します。
 
-このリポジトリの目的は、単一の HTML ファイルと最小限のサーバー設定だけで、LLM 機能を統合した Web アプリケーションを構築できることを示すことにあります。
+## 収録実験
 
-## 機能概要
+- **リアルタイム英日音声翻訳**: Web Speech APIで英語音声を認識し、Prompt APIで日本語へストリーミング翻訳します。
+- **Gemini Nano 音声理解**: Silero VADで発話区間を検出し、音声をGemini Nanoへ直接渡して文字起こしと翻訳を行います。
+- **ピンチ脱出ゲーム**: 限られたアイテムを使った英語説明を、CEFR A1/A2を想定して意味伝達重視で評価します。
 
-- ブラウザ内で完結する英語→日本語の同時通訳
-- Web Speech API による連続音声認識（英語音声をテキスト化）
-- Chrome Prompt API (LanguageModel) を使ったストリーミング翻訳
-- 翻訳済みテキストと履歴のUI表示、モデル・音声認識・AI状態のモニタリング
+各実験は独立したURLと実行環境パネルを持ち、必要なAPI、権限、Gemini Nanoの準備状況をページ内で確認できます。
 
-## 仕組み
+## 技術構成
 
-1. **音声取得と認識**  
-   `SpeechRecognition` (または `webkitSpeechRecognition`) を continuous モードで起動し、マイク入力をリアルタイムでテキスト化します。中間結果と確定結果を区別し、300ms デバウンスを用いて余分な翻訳リクエストを抑制します。
+- Vite 8 / React 19 / TypeScript
+- React Router
+- Tailwind CSS 4 / Shadcn UIの限定採用 / Radix UI / Lucide React
+- Chrome Prompt API (`LanguageModel`)
+- Web Speech API (`SpeechRecognition`)
+- Silero VAD / ONNX Runtime Web
+- Vitest / React Testing Library / Playwright
+- Railway / Caddy
 
-2. **オンデバイス LLM 翻訳**  
-   `window.LanguageModel` を通じて Gemini Nano セッションを生成します。初期プロンプトで役割を「英→日専門翻訳者」に設定し、`promptStreaming` によってチャンク単位の翻訳結果を受信しながら UI へ即時反映します。モデル状態（available / downloadable / downloading / unavailable）を確認し、必要に応じてダウンロード進捗を表示します。
+## ローカル開発
 
-3. **履歴管理とUI**  
-   翻訳結果は最大10件まで保持し、タイムスタンプ付きで過去ログとして閲覧できます。警告メッセージや状態表示用のコンポーネントを備え、API利用不可・権限エラーなどのケースに対応します。
-
-## セットアップ
+Node.js 22.12以降が必要です。
 
 ```bash
 npm install
 npm run dev
-# または npm start
 ```
 
-ローカルサーバーが `http://localhost:3000` で起動します。最新の安定版 Chrome (バージョン 140 以降) では Prompt API が標準搭載されているため、通常版の Chrome でそのまま動作します。初回利用時に Gemini Nano モデルのダウンロードが開始されるため、十分なストレージとマシンスペックを用意してください。詳細なハードウェア要件は [The Prompt API | Chrome for Developers](https://developer.chrome.com/docs/ai/prompt-api) を参照してください。
+Viteの開発サーバーが表示するURLへアクセスしてください。
 
-## 注意事項
+```bash
+npm run typecheck
+npm test
+npm run build
+npm run preview
+```
 
-- マイク権限が必要です。
-- Chrome Stable 140+ を想定しています。
-- すべての処理はブラウザ内で完結し、音声データは外部に送信されません。
-- 公開ドメインで運用する場合は Prompt API の Origin Trial に参加し、トークンを設定する必要があります。詳細は [Join the Prompt API origin trial](https://developer.chrome.com/blog/prompt-multimodal-origin-trial) を参照してください。
+## URL
+
+- `/`: プロジェクトの目的と実験一覧
+- `/experiments/translator`: リアルタイム英日音声翻訳
+- `/experiments/nano-audio`: Silero VADとGemini Nanoによる音声理解
+- `/experiments/survival`: ピンチ脱出ゲーム
+
+## 使用モデル
+
+ChromeのPrompt APIは、ブラウザ内蔵のGemini Nanoを使用します。アプリケーションからモデル名やバージョンは指定できず、Chromeが端末性能に応じたバリアントと更新を管理します。インストール済みモデルは`chrome://on-device-internals`で確認できます。
+
+Chrome 148以降と、[Prompt APIのハードウェア要件](https://developer.chrome.com/docs/ai/prompt-api)を満たす端末を想定しています。
+
+Gemini Nanoの音声入力にはGPUが必要です。音声理解実験では、Silero VADのモデル、AudioWorklet、ONNX Runtime WebのWASMを同一オリジンから読み込みます。
+
+## プライバシー上の注意
+
+- Prompt APIによるLLM推論はブラウザ内で実行され、プロンプトや生成結果はLLMサーバーへ送信されません。
+- Web Speech APIの音声認識方式はブラウザやOSに依存し、音声が外部サービスで処理される場合があります。教育現場で利用する際は対象環境の仕様を確認してください。
+
+## Railway
+
+本番環境ではマルチステージDockerfileでViteをビルドし、Caddyが`dist/`を配信します。Caddyは通常URLのSPAフォールバックと`/health`を提供します。RailwayのHealth Check Pathには`/health`を設定してください。
 
 ## ライセンス
 

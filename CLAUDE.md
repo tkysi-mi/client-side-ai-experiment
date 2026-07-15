@@ -1,96 +1,53 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## プロジェクト概要
 
-このプロジェクトは、Chrome AI API（Prompt API）を使用したリアルタイム英日音声翻訳アプリケーションです。単一のHTMLファイルで完結するスタンドアロンWebアプリケーションとして実装されています。
+EdTechにおけるClient-Side LLMの活用可能性を検証するReactアプリケーションです。Chrome Prompt APIを使い、翻訳支援と英語説明アクティビティをオンデバイスで実行します。
 
-## アーキテクチャ
+## 技術スタック
 
-### 技術スタック
-- **フロントエンド**: HTML5 + CSS3 + Vanilla JavaScript
-- **音声認識**: Web Speech API (`SpeechRecognition`)
-- **AI翻訳**: Chrome AI API (`LanguageModel`)
-- **実行環境**: Chrome Stable 140+ （Prompt API標準搭載）
+- Vite 8、React 19、TypeScript、React Router
+- Tailwind CSS 4、Shadcn/Radix UI、Lucide React
+- Chrome Prompt API (`LanguageModel`)
+- Web Speech API (`SpeechRecognition`)
+- Silero VAD、ONNX Runtime Web
+- Vitest、React Testing Library、Playwright
+- Caddyによる静的配信
 
-### ファイル構成
-- `index.html`: メインアプリケーションファイル（すべての機能を含む）
-- `.claude/settings.local.json`: Claude Code設定ファイル
+## 構造
 
-### 主要コンポーネント
+- `src/app/`: ルーティングと共通レイアウト
+- `src/ai/`: Prompt APIの能力・ダウンロード管理
+- `src/components/`: 共通部品とShadcnベースのUI
+- `src/experiments/`: 実験レジストリ、翻訳、ゲーム
+- `scripts/copy-vad-assets.mjs`: Silero VADとONNX Runtimeの実行アセットを`public/vad/`へ配置
+- `src/pages/`: ホームと404
+- `public/assets/scenarios/`: ゲーム用シナリオ画像
+- `Dockerfile` / `Caddyfile`: Railway配信
 
-#### 1. 音声認識システム
-- Web Speech APIを使用した連続音声認識
-- 英語音声の実時間テキスト変換
-- 中間結果と確定結果の分離処理
-
-#### 2. AI翻訳エンジン
-- Chrome AI API Language Modelを使用
-- ストリーミング翻訳による高速レスポンス
-- デバウンシング機能による効率的な翻訳処理
-
-#### 3. UI管理システム
-- レスポンシブデザイン対応
-- ステータス表示（API状態、音声認識状態、モデル状態）
-- 翻訳履歴管理（最大10件保持）
-
-## 開発時の注意事項
-
-### 環境要件
-- Chrome Stable 140+ を使用
-- 初回利用時に Gemini Nano モデルのダウンロードが始まるため、[Prompt API ドキュメント](https://developer.chrome.com/docs/ai/prompt-api) に記載されたハードウェア要件を満たすこと
-- マイクアクセス許可必要
-
-### デバッグとテスト
-このプロジェクトにはビルドプロセスやテストフレームワークはありません。デバッグは以下の方法で行います：
+## コマンド
 
 ```bash
-# ローカルサーバーで実行（推奨）
-python -m http.server 8000
-# または
-npx serve .
-
-# ブラウザで http://localhost:8000/index.html にアクセス
+npm run dev
+npm run typecheck
+npm run lint
+npm test
+npm run test:e2e
+npm run build
 ```
 
-### 主要な機能ポイント
+## 実装上の原則
 
-#### 1. AIモデル初期化
-- モデルの利用可能性チェック（available/downloadable/downloading/unavailable）
-- ダウンロード進捗の表示
-- エラーハンドリングと再試行機能
+- 実験を追加するときは`src/experiments/registry.ts`へ登録し、独立したルートと必要能力を定義する。
+- Gemini Nano本体の状態はContextで共有し、`LanguageModel`セッションは実験ごとに生成・破棄する。
+- ページ離脱時に音声認識、タイマー、AbortController、モデルセッションを必ず解放する。
+- モデル準備はユーザー操作から開始し、各ページに進捗と失敗理由を表示する。
+- Gemini Nano音声入力はSilero VADで発話単位に分割し、同時プロンプトを避けるため直列キューで処理する。
+- エラーをToastだけにせず、操作箇所に近いAlertで表示する。
+- カラーだけで状態を伝えず、文言とアイコンを併用する。
 
-#### 2. 音声認識の最適化
-- 連続認識による切れ目のない音声取得
-- 中間結果のデバウンシング（300ms）
-- 最終結果の即座翻訳
+## セキュリティ
 
-#### 3. 翻訳品質の向上
-- システムプロンプトによる翻訳品質制御
-- ストリーミング出力による体感速度向上
-- 重複翻訳の防止
-
-## 開発ワークフロー
-
-### コード修正時の手順
-1. HTMLファイルを直接編集
-2. ブラウザでリロードしてテスト
-3. DevToolsでコンソールエラーを確認
-4. 各種APIの状態を確認
-
-### よくある問題とデバッグ
-- **AI APIエラー**: Chrome Flagsの設定確認
-- **音声認識エラー**: マイク許可とブラウザ対応確認
-- **翻訳の遅延**: ネットワーク状況とモデル状態確認
-
-## セキュリティ考慮事項
-- すべての処理はクライアントサイドで完結
-- 外部APIへの音声データ送信なし
-- ローカルAIモデルによる翻訳処理
-
-## 今後の拡張可能性
-- 他言語対応（言語選択UI追加）
-- 翻訳結果の音声出力
-- オフライン対応の強化
-- より高精度な翻訳モデルの利用
+- Prompt APIのLLM推論はクライアントサイドで完結する。
+- Web Speech APIは環境によって外部処理されるため、完全ローカルとは表現しない。
+- 学習者データを扱う場合は、対象ブラウザとOSの音声認識仕様を確認する。
